@@ -229,7 +229,7 @@ details dl{margin-top:10px}
   <header class="top">
     <div class="brand">
       <h1>Isometric<span>a</span></h1>
-      <p>Allenamento mattutino a corpo libero · isometria, forza e HIIT</p>
+      <p>Allenamento mattutino a corpo libero · lun–ven, weekend libero</p>
     </div>
     <div class="toggles">
       <button class="tog" id="tog-sound" aria-pressed="true"><i></i>Suoni</button>
@@ -716,11 +716,11 @@ const WARM=[
 ];
 
 const DAYS=[
- {id:1,name:'Giorno 1',wd:'Lunedì',dow:1,title:'Arti inferiori e core frontale',ex:['wallsit','bear','lunge','plank','bridge1','vsit','calf']},
- {id:2,name:'Giorno 2',wd:'Mercoledì',dow:3,title:'Parte alta e core laterale',ex:['towel','pushup','copen','ytw','pike','side','superman']},
- {id:3,name:'Giorno 3',wd:'Venerdì',dow:5,title:'Total body e stabilità',ex:['sumo','birddog','revplank','towel','plankleg','abduct','bridgelong']},
- {id:4,name:'Forza',wd:'Mar · Gio',dow:[2,4],kind:'reps',title:'Circuito a ripetizioni, total body',ex:['squat','pushinc','gbridge','rowtowel','revlunge','deadbug']},
- {id:5,name:'HIIT',wd:'Sabato',dow:[6],kind:'hiit',title:'Intervalli senza salti',ex:['highknee','fastsquat','stepjack','climber']}
+ {id:1,name:'Giorno 1',wd:'Mar · Ven',iso:true,title:'Arti inferiori e core frontale',ex:['wallsit','bear','lunge','plank','bridge1','vsit','calf']},
+ {id:2,name:'Giorno 2',wd:'Mar · Ven',iso:true,title:'Parte alta e core laterale',ex:['towel','pushup','copen','ytw','pike','side','superman']},
+ {id:3,name:'Giorno 3',wd:'Mar · Ven',iso:true,title:'Total body e stabilità',ex:['sumo','birddog','revplank','towel','plankleg','abduct','bridgelong']},
+ {id:4,name:'Forza',wd:'Lun · Gio',dow:[1,4],kind:'reps',title:'Circuito a ripetizioni, total body',ex:['squat','pushinc','gbridge','rowtowel','revlunge','deadbug']},
+ {id:5,name:'HIIT',wd:'Mercoledì',dow:[3],kind:'hiit',title:'Intervalli senza salti',ex:['highknee','fastsquat','stepjack','climber']}
 ];
 const KIND={
  iso:{work:'Tieni',cueLbl:'Le spinte · tocca per vederla sulla figura',pos:'Posizione da tenere',ghost:'Sagoma blu = il movimento che cerchi di fare, senza muoverti',after:'Ora 3–5 minuti di stretching.'},
@@ -728,7 +728,18 @@ const KIND={
  hiit:{work:'Vai',cueLbl:'Esecuzione · tocca un punto per vederlo',pos:'Come si fa',ghost:'Sagoma blu = il movimento da eseguire',after:'Ora 2–3 minuti di camminata tranquilla per tornare alla calma.'}
 };
 const kindOf=d=>d.kind||'iso';
-const isToday=d=>[].concat(d.dow).includes(new Date().getDay());
+/* Isometria il martedì e il venerdì: i 3 giorni girano a rotazione (G1, G2, G3, G1...).
+   Ogni settimana ci sono 2 sedute; dal numero della settimana si ricava quale giorno tocca. */
+const ISO_DOW=[2,5];
+function isoDue(){
+  const now=new Date(),dow=now.getDay();
+  if(!ISO_DOW.includes(dow))return null;
+  const ref=new Date(2026,10,2); // lunedì 2 novembre 2026 = settimana 0
+  const week=Math.floor((now-ref)/(7*864e5));
+  const slot=week*2+(dow===5?1:0);
+  return ((slot%3)+3)%3+1;
+}
+const isToday=d=>d.iso?isoDue()===d.id:[].concat(d.dow).includes(new Date().getDay());
 
 /* ---------- vista dall'alto (Y-T-W) ---------- */
 const YTW={Y:{a:[-118,-118],r:[-62,-62]},T:{a:[180,180],r:[0,0]},W:{a:[148,-112],r:[32,-68]}};
